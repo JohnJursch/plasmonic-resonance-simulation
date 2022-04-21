@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="main.js"></script>
+    <title>Simulation Plasmonenresonanz | John Jursch</title>
+</head>
+<body>
+    <div class="collapsible_container">
+        
+        <div class="collapsible_content">
+            <div>
+                <input type="checkbox" name="show_wave" id="show_wave" checked>
+                <label for="show_wave">Welle anzeigen</label>
+            </div>
+            <div>
+                <input type="checkbox" name="show_arrows" id="show_arrows" checked>
+                <label for="show_arrows">E-Feld (Welle) anzeigen</label>
+            </div>
+            <div>
+                <input type="checkbox" name="show_field" id="show_field" checked>
+                <label for="show_field">E-Feld (Nanopartikel) anzeigen</label>
+            </div>
+            <div>
+                <input type="checkbox" name="show_expl" id="show_expl">
+                <label for="show_expl">Erklärung anzeigen</label>
+            </div>
+        </div>
+        <button class="collapsible">Einstellungen</button>
+    </div>
+
+    <div class = "slider_outside">
+        <div class="slidercontainer">
+            <span style="margin-left: 20px">Wellenlänge des Lichts: </span>
+            <span id='output'>1</span>
+            <span> nm</span>
+            <input type="range" min="400" max="700" value="500" class="slider" step ="1" id="myRange">
+        </div>
+        <br>
+        <div class="slidercontainer_eigenfrequenz">
+            <span style="margin-left: 20px">Eigenfrequenz der Elektronen: </span>
+            <span id='output_eigenfrequenz'>1</span>
+            <span> THz</span>
+            <input type="range" min="400" max="698" value="600" class="slider_eigenfrequenz" step ="1" id="myRange_eigenfrequenz">
+        </div>
+    </div>
+
+
+    <div class="buttons_container">
+        <button class="button" id="startButtonId" style="background-color: #7bc86c;" >Start</button>
+        <button class="button" id="resetButtonId" style="background-color: #eb5a46;">Reset</button>
+    </div>
+    <div class="speed_container">
+        <div class="geschwindigkeit_container">
+            <div class="geschwindigkeit_label">
+                <span>Animationsgeschwindigkeit: </span>
+                <span id='output_geschw'>5</span>
+            </div>
+            <input class="speed_slider" type="range" min="0" max="4" value="4"  step ="1" id="speedRange">
+        </div>
+        <div class="speedButtons_container">
+            <button class="button" id="langsamerButtonId" ><span>Langsamer</span></button>
+            <button class="button" id="schnellerButtonId" ><span>Schneller</span></button>
+        </div>
+        
+    </div>
+    
+    <div class="expl" id="expl1" style="position: absolute; left: 20%; top: 25%;"></div>
+    <div class="expl" id="expl2" style="position: absolute; left: 60%; top: 40%; width: 25%;"></div>
+    <div class="expl" id="expl3" style="position: absolute; left: 35%; bottom: 15%; width: 30%"></div>
+    <div class="expl" id="expl4" style="position: absolute; left: 35%; top: 70%; width: 35%;"></div>
+    <div class="expl" id="expl5" style="position: absolute; left: 55%; top: 25%; width: 30%"></div>
+    <div class="expl" id="expl6" style="position: absolute; left: 65%; top: 60%; max-width: 35%;"></div>
+    <div class="expl" id="expl7" style="position: absolute; left: 70%; top: 15%; max-width: 20%"></div>
+
+
+    <div id="overlay" onclick="overlayOff()">
+        <div id="overlay_text">
+            <h2 style="text-align: center;">Hilfe</h2>
+            <p>Bevor du die Simulation starten kannst, musst du alle Regler einmal bewegen und die Häkchen in dem Feld „Einstellungen“ setzen. Nach dem ersten Starten kannst du beliebige Einstellungen vornehmen.</p>
+            <p>In dieser Simulation siehst du die Wechselwirkung einer Lichtwelle (links) mit einem metallischen Nanopartikel (mittig). In dem Nanopartikel sind die freien Elektronen dargestellt. Du kannst dir das elektrische Feld der Lichtwelle bei den Einstellungen anzeigen lassen. Das Feld ist durch Pfeile der Feldvektoren dargestellt.</p>
+            <p>Die Simulation kannst du mithilfe einer Maus oder der Tastatur bedienen. Die Tastenfunktionen siehst du hier:</p>
+            <ul>
+                <li>Start/Pause - Leertaste</li>
+                <li>Reset - R</li>
+                <li>Schneller - Pfeil hoch</li>
+                <li>Langsamer - Pfeil runter</li>
+            </ul>
+            <br><br><br>
+            <h3>Hinweise:</h3>
+            <p>Diese Simulation wurde im Rahmen meiner Staatsexamensarbeit in der Fachdidaktik Chemie an der TU Dresden erstellt und kann frei verwendet werden. Sie richtet sich an Lehrkräfte, die das Thema der Plasmonenresonanz in Nanopartikeln im Unterricht oder in außerschulischen Lehr-Lernsettings behandeln möchten. Der Quellcode kann hier eingesehen werden: </p>
+        </div>
+    </div>
+      
+    <button id="overlay_button" onclick="overlayOn()">Hilfe ?</button>
+
+
+    <div id="copyright_stamp">
+        <span>&copy; 2022 John Jursch</span>
+    </div>
+
+
+    <canvas id="canvas"></canvas>
+
+    <canvas id="canvas_matter"></canvas>
+ 
+  
+    
+
+    <style>
+       
+
+    * {
+        font-family: 'Trebuchet MS', sans-serif;
+    }
+
+    html,body{
+        margin: 0;
+        padding: 0;
+    }
+
+    .collapsible {
+        background-color: #777;
+        color: white;
+        cursor: pointer;
+        padding: 18px;
+        border: none;
+        text-align: left;
+        outline: none;
+        font-size: 15px;
+        width: 100%;
+        
+    }
+
+    .collapsible_container {
+        position: fixed;
+        bottom: 10px;
+        left: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items:flex-end;
+        justify-content: center;
+        width: 25%;
+        z-index: 10;
+    }
+    
+    .active, .collapsible:hover {
+        background-color: #555;
+    }
+
+    .collapsible:after {
+        content: '\002B';
+        color: white;
+        font-weight: bold;
+        float: right;
+        margin-left: 5px;
+    }
+
+    .active:after {
+        content: "\2212";
+    }
+
+    .collapsible_content {
+        position: relative;
+        left: 0px;
+        bottom: 0;
+        width: 100%;
+        font-size: 15px;
+        display: none;
+        overflow: hidden;
+        /* background-color: #f1f1f1; */
+        background-color: none;
+        max-height: 0;
+        transition: max-height 0.5s ease-out;
+        /* transition: border 0.2s ease-out; */
+    }
+
+    .collapsible_content>div{
+        margin: 10px 0px;
+        margin-left: 5px;
+    }
+
+    .collapsible_content>div, .collapsible_content>div>label{
+        cursor: pointer;
+    }
+
+    .slider_outside {
+        position: fixed;
+        top: 10px;
+        width: 30%;
+        left: 35%;
+        z-index: 2;
+    }
+    
+    .slidercontainer, .slidercontainer_eigenfrequenz {
+        width: 100%; /* Width of the outside container */
+        /* position: fixed;
+        top: 10px;
+        left: 10px;
+        display: block; */
+    }
+
+    /* The slider itself */
+    .slider, .slider_eigenfrequenz {
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        width: 100%; /* Full-width */
+
+        height: 20px; /* Specified height */
+        /* background: #d3d3d3;  */
+        background: rgb(255, 255, 255);
+        outline: black;
+        opacity: 0.8; 
+        -webkit-transition: .2s; 
+        transition: opacity .2s;
+        border: 1px solid black;
+        border-radius: 4px;
+        box-shadow: 2px 2px 5px #444;
+        margin-top: 10px;
+    }
+
+    /* Mouse-over effects */
+    .slider:hover, .slider_eigenfrequenz:hover {
+        opacity: 1; /* Fully shown on mouse-over */
+    }
+
+    /* The slider handle (use -webkit- (Chrome, Opera, Safari, Edge) and -moz- (Firefox) to override default look) */
+    .slider::-webkit-slider-thumb, .slider_eigenfrequenz::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 30px; /* Set a specific slider handle width */
+        height: 21px; /* Slider handle height */
+        background: #04AA6D; 
+        background: var(--sliderthumbColor);
+        cursor: pointer; /* Cursor on hover */
+        border: 0px solid black;
+        border-radius: 3px;
+    }
+
+    .slider::-moz-range-thumb, .slider_eigenfrequenz::-moz-range-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 30px; /* Set a specific slider handle width */
+        height: 21px; /* Slider handle height */
+        background: #04AA6D; 
+        background: var(--sliderthumbColor);
+        cursor: pointer; /* Cursor on hover */
+        border: 0px solid black;
+        border-radius: 3px;
+    }
+
+    .speed_slider{
+        -webkit-appearance: none;  /* Override default CSS styles */
+        appearance: none;
+        height: 10px;
+        background: rgb(255, 255, 255);
+        outline: black;
+        border: 1px solid black;
+        border-radius: 5px;
+        box-shadow: 2px 2px 3px #666;
+    }
+
+    .speed_slider::-webkit-slider-thumb{
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        background: black; 
+        cursor: pointer; /* Cursor on hover */
+        border-radius: 50%;
+    }
+    .speed_slider::-moz-range-thumb{
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 15px; /* Set a specific slider handle width */
+        height: 15px; /* Slider handle height */
+        background: black; 
+        cursor: pointer; /* Cursor on hover */
+        border-radius: 50%;
+    }
+
+
+    /* BUTTONS */
+    .buttons_container{
+        position: fixed; 
+        bottom: 10px;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        z-index: 2
+    }
+
+    .button{
+        /* width: 130px; */
+        width: 10%;
+        height: 80px;
+        margin: auto 4px auto 4px;
+        border: 2px solid black;
+        border-radius: 4px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .button:hover{
+        box-shadow: 2px 2px 5px #444;
+    }
+
+    .button:active {
+        transform: translateY(2px);
+    }
+
+    .speed_container{
+        position: fixed;
+        right: 10px;
+        bottom: 10px;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+        z-index: 2;
+    }
+
+    .geschwindigkeit_container{
+        margin: 10px auto;
+        width: 100%;
+    }
+
+    .geschwindigkeit_label{
+        position: relative;
+        left: 12%;
+        width: 80%;
+    }
+    
+    .speed_slider{
+        position: relative;
+        left: 10%;
+        width: 80%;
+        margin-top: 10px;
+    }
+
+    .speedButtons_container{
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+    }
+
+    #langsamerButtonId, #schnellerButtonId{
+        width: 130px;
+        height: 40px;
+        font-size: 15px;
+    }
+
+    #langsamerButtonId span {
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+    
+    #langsamerButtonId span:after {
+        content: '\2212';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        right: -20px;
+        transition: 0.5s;
+    }
+    #langsamerButtonId:hover span {
+        padding-right: 25px;
+    }
+
+    #langsamerButtonId:hover span:after {
+        opacity: 1;
+        right: 0;
+    }
+
+    #schnellerButtonId span {
+        cursor: pointer;
+        display: inline-block;
+        position: relative;
+        transition: 0.5s;
+    }
+
+    #schnellerButtonId span:before {
+        content: '\002B';
+        position: absolute;
+        opacity: 0;
+        top: 0;
+        left: -20px;
+        transition: 0.5s;
+    }
+
+    #schnellerButtonId:hover span {
+        padding-left: 25px;
+    }
+
+    #schnellerButtonId:hover span:before {
+        opacity: 1;
+        left: 0;
+    } 
+
+
+    #canvas {
+        margin: 0;
+        padding: 0;
+        background-color: transparent;
+        /* background-color: #dadada; */
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 1;
+        /* display: none; */
+    }
+
+    #canvas_matter {
+        position: absolute;
+        top: 0;
+        left: 0;
+        margin: 0;
+        padding: 0;
+        z-index: 0;
+    }
+
+    .expl{
+        border: 1px solid black;
+        border-radius: 6px;
+        background-color: rgb(255, 248, 151);
+        padding: 10px 10px;
+        z-index: 5;
+        
+    }
+
+    #overlay {
+        position: absolute;
+        display: none;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.9);
+        z-index: 20;
+        cursor: pointer;
+    }
+
+    #overlay_text{
+        position: absolute;
+        top: 0px;
+        left: 50%;
+        font-size: 1.2rem;
+        color: white;
+        text-align: justify;
+        transform: translate(-50%,0);
+        -ms-transform: translate(-50%,0);
+        width: 80%;
+    }
+
+    #overlay_button{
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        z-index: 2;
+        height: 40px;
+        width: 80px;
+        font-size: 15px;
+    }
+
+    #copyright_stamp{
+        position: fixed;
+        left: 5px;
+        top: 5px;
+        color: #777;
+        font-size: 20px;
+        z-index: 2;
+    }
+    </style>
+
+<script>
+function overlayOn() {
+    document.getElementById("overlay").style.display = "block";
+  }
+  
+  function overlayOff() {
+    document.getElementById("overlay").style.display = "none";
+  }
+
+   </script>
+
+<script type="module" src="main.js"></script>
+
+<script src="matter.js"></script>
+    
+</body>
+</html>
